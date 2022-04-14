@@ -14,7 +14,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.0.0",
-    "pg-promise": "^10.11.1"
+    "pg-promise": "^10.11.1",
+    "postgres": "^3.0.5"
   },
   "devDependencies": {
     "mocha": "^9.2.2"

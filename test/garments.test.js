@@ -6,7 +6,7 @@ require('dotenv').config()
 
 describe('As part of the sql refresh workshop', () => {
 	
-	const DATABASE_URL = process.env.DATABASE_URL;
+	const DATABASE_URL = process.env.DATABASE_URL||'postgres://gary:gar123@localhost:5432/garment_app';
 
 	const pgp = PgPromise({});
 	const db = pgp(DATABASE_URL);
@@ -22,14 +22,16 @@ describe('As part of the sql refresh workshop', () => {
 	it('you should create a garment table in the database', async () => {
 
 		// use db.one
+		const result=await db.one('select count(*) from garment')
 
 		// no changes below this line in this function
 		assert.ok(result.count);
 	});
 
-	it('there should be 11 garments in the garment table - added using the supplied script', async () => {
+	it('there should be 30 garments in the garment table - added using the supplied script', async () => {
 
 		// use db.one as 1 result us expected
+		const result=await db.one('select count(*) from garment')
 
 		// no changes below this line in this function
 
@@ -38,21 +40,24 @@ describe('As part of the sql refresh workshop', () => {
 
 	it('you should be able to find all the Summer garments', async () => {
 		// add some code below
-
+		const result = await db.one('select count(*) from garment where season = $1;',
+		'Summer',)
 		// no changes below this line in this function
 		assert.equal(12, result.count);
 	});
 
 	it('you should be able to find all the Winter garments', async () => {
 		// add some code below
-
+		const result = await db.one('select count(*) from garment where season = $1;',
+		'Winter',)
 		// no changes below this line in this function
 		assert.equal(5, result.count);
 	});
 
 	it('you should be able to find all the Winter Male garments', async () => {
 		// change the code statement below
-
+		const result = await db.one('select count(*) from garment where season = $1 and gender = $2;',
+		['Winter','Male'],)
 		// no changes below this line in this function
 		assert.equal(3, result.count);
 	});
@@ -128,3 +133,7 @@ describe('As part of the sql refresh workshop', () => {
 
 
 }).timeout(5000);
+
+
+
+
