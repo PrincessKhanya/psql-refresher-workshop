@@ -5,14 +5,14 @@ const fs = require("fs");
 require('dotenv').config()
 
 describe('As part of the sql refresh workshop', () => {
-	
-	const DATABASE_URL = process.env.DATABASE_URL||'postgres://gary:gar123@localhost:5432/garment_app';
+
+	const DATABASE_URL = process.env.DATABASE_URL || 'postgres://gary:gar123@localhost:5432/garment_app';
 
 	const pgp = PgPromise({});
 	const db = pgp(DATABASE_URL);
 
 	// we are explicitly not using an arrow function here to support this.timeout
-	before(async function (){
+	before(async function () {
 		this.timeout(5000);
 		await db.none(`delete from garment`);
 		const commandText = fs.readFileSync('./sql/data.sql', 'utf-8');
@@ -22,7 +22,7 @@ describe('As part of the sql refresh workshop', () => {
 	it('you should create a garment table in the database', async () => {
 
 		// use db.one
-		const result=await db.one('select count(*) from garment;')
+		const result = await db.one('select count(*) from garment;')
 
 		// no changes below this line in this function
 		assert.ok(result.count);
@@ -31,7 +31,7 @@ describe('As part of the sql refresh workshop', () => {
 	it('there should be 30 garments in the garment table - added using the supplied script', async () => {
 
 		// use db.one as 1 result us expected
-		const result=await db.one('select count(*) from garment;')
+		const result = await db.one('select count(*) from garment;')
 
 		// no changes below this line in this function
 
@@ -41,7 +41,7 @@ describe('As part of the sql refresh workshop', () => {
 	it('you should be able to find all the Summer garments', async () => {
 		// add some code below
 		const result = await db.one('select count(*) from garment where season = $1',
-		['Summer']);
+			['Summer']);
 		// no changes below this line in this function
 		assert.equal(12, result.count);
 	});
@@ -49,7 +49,7 @@ describe('As part of the sql refresh workshop', () => {
 	it('you should be able to find all the Winter garments', async () => {
 		// add some code below
 		const result = await db.one('select count(*) from garment where season = $1',
-		['Winter']);
+			['Winter']);
 		// no changes below this line in this function
 		assert.equal(5, result.count);
 	});
@@ -57,7 +57,7 @@ describe('As part of the sql refresh workshop', () => {
 	it('you should be able to find all the Winter Male garments', async () => {
 		// change the code statement below
 		const result = await db.one('select count(*) from garment where season = $1 and gender = $2;',
-		['Winter','Male']);
+			['Winter', 'Male']);
 		// no changes below this line in this function
 		assert.equal(3, result.count);
 	});
@@ -65,9 +65,9 @@ describe('As part of the sql refresh workshop', () => {
 	it('you should be able to change a given Male garment to a Unisex garment', async () => {
 
 		// use db.one with an update sql statement
-		const result = await db.one('update garment set gender = $1 where gender = $2 and description = $3 returning $4',['Unisex', 'Male', 'Red hooded jacket', 'sucess'])
+		const result = await db.one('update garment set gender = $1 where gender = $2 and description = $3 returning $4', ['Unisex', 'Male', 'Red hooded jacket', 'result'])
 		// write your code above this line
-		
+
 		const gender_sql = 'select gender from garment where description = $1'
 		const gender = await db.one(gender_sql, ['Red hooded jacket'], r => r.gender);
 		assert.equal('Unisex', gender);
@@ -79,7 +79,7 @@ describe('As part of the sql refresh workshop', () => {
 		// use db.none - change code below here...
 		const garment_add = 'insert into garment (description, img, season, gender, price) values ($1,$2,$3,$4,$5);'
 		db.none(garment_add, ['Red Shirt', 'womans-128x128-455144.png', 'All Seasons', 'Male', '199.99']);
-		db.none(garment_add, ['Red hooded jacket','hoodie-128x128-455122.png', 'Winter', 'Male', '299.99']);
+		db.none(garment_add, ['Red hooded jacket', 'hoodie-128x128-455122.png', 'Winter', 'Male', '299.99']);
 		db.none(garment_add, ['Orange dress(formal)', 'frock-128x128-455120.png', 'Summer', 'Female', '249.99']);
 		db.none(garment_add, ['Short Skirt(Lime)', 'skirt-128x128-455130.png', 'Summer', 'Female', '199.99']);
 		db.none(garment_add, ['Golf t-shirt(Red)', 'womans-128x128-455139.png', 'All Seasons', 'Female', '79.24']);
@@ -99,31 +99,31 @@ describe('As part of the sql refresh workshop', () => {
 	it('you should be group garments by gender and count them', async () => {
 		// and below this line for this function will
 		const garmentsGrouped = await db.many(
-		  `select count(*), gender from garment group by gender order by gender`,
+			`select count(*), gender from garment group by gender order by gender`,
 		);
 		// write your code above this line
-	
+
 		const expectedResult = [
-		  {
-			count: '16',
-			gender: 'Female',
-		  },
-		  {
-			count: '15',
-			gender: 'Male',
-		  },
-		  {
-			count: '4',
-			gender: 'Unisex',
-		  },
+			{
+				count: '16',
+				gender: 'Female',
+			},
+			{
+				count: '15',
+				gender: 'Male',
+			},
+			{
+				count: '4',
+				gender: 'Unisex',
+			},
 		];
 		assert.deepStrictEqual(expectedResult, garmentsGrouped);
-	  });
+	});
 
 	it('you should be able to remove all the Unisex garments', async () => {
 
 		// and below this line for this function will
-		const delete_garment=db.none('delete from garment where gender = $1',['Unisex'],)
+		const delete_garment = db.none('delete from garment where gender = $1', ['Unisex'],)
 		// write your code above this line
 
 		const gender_count_sql = 'select count(*) from garment where gender = $1'
@@ -133,7 +133,7 @@ describe('As part of the sql refresh workshop', () => {
 	});
 
 
-	
+
 	after(async () => {
 		db.$pool.end();
 	});
